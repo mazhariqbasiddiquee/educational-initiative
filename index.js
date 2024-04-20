@@ -1,106 +1,123 @@
 class Product {
+  constructor() {
+    this.productObject = {};
+  }
 
-    constructor(){
-      this.productObject={}
-      this.cartProduct={}
-
+  addProduct(name, price, availability) {
+    if (this.productObject[name] === undefined) {
+      this.productObject[name] = { name, price, isAvailable: availability };
+      console.log("Product added in store");
+    } else {
+      console.log("Product already exists in store");
     }
+  }
 
-    // Add product to store 
-    addProduct(name,price,availability){
-      if(this.productObject[name]==undefined){
-        this.productObject[name]={name:name,price,isAvailable:availability}
-        console.log("Product added in store")
+  getProduct() {
+    return this.productObject;
+  }
+}
+
+
+
+
+class Cart extends Product {
+  constructor(productList) {
+    super()
+    this.cartProducts = {};
+    this.productList = productList; 
+  }
+
+  addToCart(name) {
+    const product = this.productList.getProduct()[name]; 
+
+    if (product && product.isAvailable) {
+      if (this.cartProducts[name]) {
+        this.cartProducts[name].quantity++;
+      } else {
+        this.cartProducts[name] = { ...product, quantity: 1 };
       }
-      else{
-        console.log("Product already exist in store")
-      }
+      console.log(`${name} added to cart.`);
+    } else {
+      console.log(`Sorry, ${name} is not available.`);
     }
-
-
-    // Get product from store
-    getProduct(){
-      return this.productObject
-    }
-
-
-
-    // Add product to cart
-    addtoCart(name){
-      if(this.productObject[name]!=undefined&&this.productObject[name].isAvailable){
-        this.cartProduct[name]={name:name,quantity:1,price:this.productObject[name].price}
-
-        return "product is added"
-
-      }
-      else{
-        return "product is not available"
-      }
-    }
-
-    // View product of the cart
-    getCart(){
-        return this.cartProduct
-    }
-
-
-    // Update product of the cart
-   updateCart(name,quantity){
-    if(this.cartProduct[name]!=undefined){
-        this.cartProduct[name].quantity=quantity
-
-        return "Quantity updated"
-    }
-    else{
-        return "Product is not in cart"
-    }
-   }
-
-//    Remove product from the cart
-   removeFromCart(name){
-    if(this.cartProduct[name]!=undefined){
-       delete  this.cartProduct[name]
-
-        return "Quantity deleted"
-    }
-    else{
-        return "Product is not in cart"
-    }
-
-   }
-
-
-//    Calculate total bill
-   totalBill(){
-       if(Object.keys(this.cartProduct).length>0){
-        let sum=0
-        for( let a in this.cartProduct){
-            sum+=this.cartProduct[a].price*this.cartProduct[a].quantity
-        }
-
-        return `Your total bill is ${sum}`
-       }
-         else{
-        return "Cart is empty"
-        }
-   }
-
-
-
-
+  }
+  displayCart(){
+    return this.cartProducts
   }
 
 
+}
 
 
-  let products=new Product()
 
-  products.addProduct("shirt",100,true)
-  products.addProduct("Paint",200,true)
-  products.addtoCart("Paint")
-  products.updateCart("Paint",2)
-  console.log(products.getProduct())
-  console.log(products.getCart())
-console.log(products.totalBill())
+let products = new Product();
+products.addProduct("shirt", 100, true);
+products.addProduct("paint", 200, true);
+
+let cart = new Cart(products); 
+
+cart.addToCart("shirt");
+cart.addToCart("paint");
+cart.addToCart("brush"); 
+
+console.log(cart.displayCart());
+
+
+  
+
+  class UpdateCart extends Cart {
+    constructor() {
+      super();
+    }
+  
+    updateQuantity(name, newQuantity) {
+      if (this.cartProducts[name]) {
+        this.cartProducts[name].quantity = newQuantity;
+        console.log(`Quantity of ${name} updated to ${newQuantity}.`);
+      } else {
+        console.log(`${name} is not in the cart.`);
+      }
+    }
+  }
+  
+
+  class DeleteFromCart extends Cart {
+    constructor() {
+      super();
+    }
+  
+    deleteProduct(name) {
+      if (this.cartProducts[name]) {
+        delete this.cartProducts[name];
+        console.log(`${name} removed from cart.`);
+      } else {
+        console.log(`${name} is not in the cart.`);
+      }
+    }
+  }
+
+
+  
+  class CalculateTotalBill extends Cart {
+    constructor() {
+      super();
+    }
+  
+    calculate() {
+      let total = 0;
+      for (const itemName in this.cartProducts) {
+        const item = this.cartProducts[itemName];
+        total += item.price * item.quantity;
+      }
+      return total;
+    }
+  }
+  
+
+
+
+const  bill=new CalculateTotalBill()
+console.log(bill.calculate())
+  
 
 
